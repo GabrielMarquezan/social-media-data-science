@@ -1,0 +1,8 @@
+chart_id;file_name;status;message
+post_type_avg_comments;post_type_avg_comments.png;success;ok
+timing_hour_avg_comments;timing_hour_avg_comments.png;success;ok
+timing_weekday_avg_comments;timing_weekday_avg_comments.png;success;ok
+top_hashtags_engagement;top_hashtags_engagement.png;success;top_hashtags_engagement: removidos 69% de registros com NaN
+coauthor_impact_comments_views;coauthor_impact_comments_views.png;success;ok
+quality_by_type;quality_by_type.png;success;ok
+community_vs_quality;community_vs_quality.png;success;ok
