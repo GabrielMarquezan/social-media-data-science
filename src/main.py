@@ -7,22 +7,21 @@ import os
 from uuid import uuid4
 from pathlib import Path
 
-from extrai_posts_excel import generate_excel_for_each_post
-from analyze_data import analyze
+from src.extrai_posts_excel import generate_excel_for_each_post
+from src.analyze_data import analyze
 
 load_dotenv()
 
 TOKEN = os.getenv("APIFY_API_KEY")  
-
-# Recebe links de posts separados em um por linha
-# Faz requisição pra API do Apify e aguarda resultado
-# Gera resultados em csv
-# Faz a análise e fornece as métricas
+ACTOR_ID = 'apify/instagram-scraper'
 
 async def main() -> None:
+    # Recebe os links
     links = []
     with open("links.txt", "r") as links_file:
         links = links_file.readlines()
+
+    # Faz a request
 
     request_input = {
         "addParentData": False,
@@ -35,7 +34,7 @@ async def main() -> None:
         
     apify_client = ApifyClientAsync(TOKEN)
 
-    actor_client = apify_client.actor('apify/instagram-scraper')
+    actor_client = apify_client.actor(ACTOR_ID)
     call_result = await actor_client.call(run_input=request_input)
 
     if call_result is None:
@@ -45,6 +44,8 @@ async def main() -> None:
     run_client = actor_client.last_run()
     dataset_client = run_client.dataset()
     dataset_data = await dataset_client.list_items()
+
+    # Faz a análise
 
     run_id = uuid4()
 
