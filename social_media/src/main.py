@@ -1,62 +1,80 @@
-import pandas as pd
-import json
 import asyncio
-from apify_client import ApifyClientAsync
-from dotenv import load_dotenv
-import os
-from uuid import uuid4
+import logging
 from pathlib import Path
+from uuid import uuid4
 
-load_dotenv()
+from social_media.src.config import build_config
+from social_media.src.dependencies import build_dependencies
+from social_media.src.exporters.csv import export_csvs
+from social_media.src.exporters.png import export_charts
+from social_media.src.exporters.xlsx import export_xlsx
+from social_media.src.extract.apify import extract
+from social_media.src.log import configure_logging, set_run_id
+from social_media.src.pipeline.runner import run_pipeline
+from social_media.src.pipeline.steps.comment_features import comment_features_step
+from social_media.src.pipeline.steps.content_type import content_type_step
+from social_media.src.pipeline.steps.nlp_sentiment_terms import nlp_sentiment_terms_step
+from social_media.src.pipeline.steps.nlp_terms import nlp_terms_step
+from social_media.src.pipeline.steps.nlp_topics import nlp_topics_step
+from social_media.src.pipeline.steps.parse import parse_step
+from social_media.src.pipeline.steps.post_conversation import post_conversation_step
+from social_media.src.pipeline.steps.post_features import post_features_step
+from social_media.src.pipeline.steps.timing import timing_step
 
-TOKEN = os.getenv("APIFY_API_KEY")  
-ACTORS = ["apify/instagram-post-scraper", "apify/instagram-comment-scraper"]
-ACTOR = "apify/instagram-scraper"
+logger = logging.getLogger(__name__)
+
+_STEPS = [
+    parse_step,
+    post_features_step,
+    comment_features_step,
+    post_conversation_step,
+    content_type_step,
+    timing_step,
+    nlp_terms_step,
+    nlp_topics_step,
+    nlp_sentiment_terms_step,
+]
+
+
+def read_links(path: Path) -> list[str]:
+    """Lê o arquivo de links, removendo linhas vazias."""
+    if not path.exists():
+        raise FileNotFoundError(f"Arquivo de links não encontrado: {path}")
+
+    with open(path, "r", encoding="utf-8") as f:
+        lines = [line.strip() for line in f if line.strip()]
+
+    logger.info("Links carregados.", extra={"links_count": len(lines), "path": str(path)})
+    return lines
+
 
 async def main() -> None:
-    links = []
-    with open("links.txt", "r") as links_file:
-        links = links_file.readlines()
+    run_id = str(uuid4())
+    set_run_id(run_id)
 
-    request = {
-        "addParentData": False,
-        "directUrls": links,
-        "resultsLimit": 100,
-        "resultsType": "posts",
-        "searchLimit": 10,
-        "searchType": "hashtag"
-    }
+    config = build_config()
+    configure_logging(config.log_level, config.log_format)
 
-    # por post: 0.0017
-    # por comentario: 0.0026 
-    # Total com scrapers especificos: 0.0026 x 15 + 0.0017 = 0.0407
-    # Scraper generalista: 0.0027
+    logger.info("Iniciando execução.", extra={"run_id": run_id})
 
-    apify_client = ApifyClientAsync(TOKEN)
+    deps = build_dependencies(config)
 
-    actor_client = apify_client.actor(ACTOR)
-    call_result = await actor_client.call(run_input=request)
+    links = read_links(Path("links.txt"))
+    raw_json_path = await extract(links, config, run_id)
 
-    if call_result is None:
-        print('Actor run failed.')
-        return
+    initial_dfs = {"raw_json_path": raw_json_path}
+    dfs = run_pipeline(_STEPS, initial_dfs, config, deps)
 
-    run_client = actor_client.last_run()
-    dataset_client = run_client.dataset()
-    dataset_data = await dataset_client.list_items()
+    output_root = config.output_dir / run_id
+    export_xlsx(dfs, output_root, config)
+    export_charts(dfs, output_root / "charts", config)
+    export_csvs(dfs, output_root)
 
-    # Faz a análise
-
-    run_id = uuid4()
-
-    os.makedirs(f"data", exist_ok=True)
-
-    json_path = Path(f"data/comments.json")
-    with open(json_path, "w", encoding="utf-8") as file:
-        json.dump(dataset_data.items, file, indent=4, ensure_ascii=False)
-
-    current_data_dir = Path(f"data/{run_id}/posts")
+    logger.info(
+        "Execução finalizada.",
+        extra={"run_id": run_id, "output_root": str(output_root)},
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

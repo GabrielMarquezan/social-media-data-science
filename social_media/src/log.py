@@ -43,9 +43,12 @@ class _JSONFormatter(logging.Formatter):
         return json.dumps(data, default=str)
 
 
-def configure_logging() -> None:
-    level = os.getenv("LOG_LEVEL", "DEBUG").upper()
-    fmt = os.getenv("LOG_FORMAT", "json").lower()
+def configure_logging(
+    log_level: str | None = None,
+    log_format: str | None = None,
+) -> None:
+    level = (log_level or os.getenv("LOG_LEVEL", "DEBUG")).upper()
+    fmt = (log_format or os.getenv("LOG_FORMAT", "json")).lower()
 
     handler = logging.StreamHandler(sys.stderr)
 
@@ -70,6 +73,18 @@ def configure_logging() -> None:
     root.handlers.clear()
     root.addHandler(handler)
     root.setLevel(level)
+
+    # Reduz ruído de bibliotecas externas nos logs estruturados
+    for noisy_logger in (
+        "apify_client",
+        "matplotlib",
+        "openpyxl",
+        "PIL",
+        "urllib3",
+        "transformers",
+        "torch",
+    ):
+        logging.getLogger(noisy_logger).setLevel(logging.WARNING)
 
     logging.getLogger(__name__).debug(
         "Logging configured with level=%s and format=%s.",
