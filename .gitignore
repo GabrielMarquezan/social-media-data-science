@@ -1,0 +1,31 @@
+# Ambiente
+.env
+.env.*
+.venv/
+venv/
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Testes
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# Dados e outputs gerados automaticamente
+/data/raw_*.json
+/output/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
