@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from typing import Any, Callable
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -18,7 +19,7 @@ from social_media.src.config import Config
 
 logger = logging.getLogger(__name__)
 
-_CHARTS: list[tuple[str, str, callable]] = [
+_CHARTS: list[tuple[str, str, Callable[..., Any]]] = [
     ("likes_comments_timeline", "posts", plot_likes_comments_timeline),
     ("top_posts_engagement", "posts", plot_top_posts_engagement),
     ("posts_by_type", "posts", plot_posts_by_type),
