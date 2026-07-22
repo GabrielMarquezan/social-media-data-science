@@ -1,5 +1,0 @@
-source;topic_id;terms;metodo
-comentarios;topico_1;parabens, maria, santa, pena, sabe, resultado;lda_sklearn
-comentarios;topico_2;ufsm, gente, extensao, agenda, historia, deixa;lda_sklearn
-comentarios;topico_3;silveira, muito, desde, quando, hoje, bom;lda_sklearn
-comentarios;topico_4;projeto, todos, cara, animais, deus, amo;lda_sklearn

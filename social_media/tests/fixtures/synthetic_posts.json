@@ -1,0 +1,141 @@
+[
+    {
+        "id": "img_001",
+        "type": "Image",
+        "shortCode": "IMG001",
+        "caption": "Primeira imagem de teste! Confira o link na bio. #teste #mvp",
+        "hashtags": ["teste", "mvp"],
+        "mentions": ["usuario_exemplo"],
+        "url": "https://www.instagram.com/p/IMG001/",
+        "commentsCount": 2,
+        "firstComment": "Muito bom!",
+        "latestComments": [
+            {
+                "id": "c_img_001_1",
+                "text": "Muito bom!",
+                "timestamp": "2024-01-15T10:30:00.000Z",
+                "repliesCount": 0,
+                "replies": [],
+                "likesCount": 3,
+                "owner": {
+                    "id": "u001",
+                    "username": "comentador1",
+                    "full_name": "Comentador Um",
+                    "is_verified": true,
+                    "profile_pic_url": "https://example.com/u001.jpg"
+                }
+            },
+            {
+                "id": "c_img_001_2",
+                "text": "Você usa qual edição?",
+                "timestamp": "2024-01-15T11:00:00.000Z",
+                "repliesCount": 1,
+                "replies": [
+                    {
+                        "id": "r_img_001_2_1",
+                        "text": "Uso o Lightroom.",
+                        "timestamp": "2024-01-15T11:05:00.000Z",
+                        "repliesCount": 0,
+                        "replies": [],
+                        "likesCount": 1,
+                        "owner": {
+                            "id": "u002",
+                            "username": "autor_post",
+                            "full_name": "Autor do Post",
+                            "is_verified": false,
+                            "profile_pic_url": null
+                        }
+                    }
+                ],
+                "likesCount": 2,
+                "owner": {
+                    "id": "u003",
+                    "username": "pergunta_user",
+                    "full_name": null,
+                    "is_verified": false,
+                    "profile_pic_url": "https://example.com/u003.jpg"
+                }
+            }
+        ],
+        "likesCount": 42,
+        "timestamp": "2024-01-15T10:00:00.000Z",
+        "ownerUsername": "autor_post",
+        "ownerId": "u002",
+        "ownerFullName": "Autor do Post",
+        "productType": "feed",
+        "childPosts": []
+    },
+    {
+        "id": "vid_001",
+        "type": "Video",
+        "shortCode": "VID001",
+        "caption": "Video de teste com CTA: clique aqui!",
+        "hashtags": ["video", "reels"],
+        "mentions": [],
+        "url": "https://www.instagram.com/p/VID001/",
+        "commentsCount": 1,
+        "firstComment": "Show!",
+        "latestComments": [
+            {
+                "id": "c_vid_001_1",
+                "text": "Show!",
+                "timestamp": "2024-02-20T14:20:00.000Z",
+                "repliesCount": 0,
+                "replies": [],
+                "likesCount": 5,
+                "owner": {
+                    "id": "u004",
+                    "username": "fan_user",
+                    "full_name": "Fan User",
+                    "is_verified": false,
+                    "profile_pic_url": "https://example.com/u004.jpg"
+                }
+            }
+        ],
+        "likesCount": 120,
+        "timestamp": "2024-02-20T14:00:00.000Z",
+        "ownerUsername": "autor_post",
+        "ownerId": "u002",
+        "ownerFullName": "Autor do Post",
+        "productType": "clips",
+        "videoViewCount": 1500,
+        "videoDuration": 15.5,
+        "childPosts": []
+    },
+    {
+        "id": "side_001",
+        "type": "Sidecar",
+        "shortCode": "SIDE001",
+        "caption": null,
+        "hashtags": [],
+        "mentions": [],
+        "url": "https://www.instagram.com/p/SIDE001/",
+        "commentsCount": 0,
+        "firstComment": "",
+        "latestComments": [],
+        "likesCount": 7,
+        "timestamp": "2024-03-10T09:00:00.000Z",
+        "ownerUsername": "outro_autor",
+        "ownerId": "u005",
+        "ownerFullName": null,
+        "productType": "carousel_container",
+        "childPosts": [
+            {
+                "id": "child_001",
+                "type": "Image",
+                "shortCode": "CHILD001",
+                "caption": "",
+                "hashtags": [],
+                "mentions": [],
+                "url": "https://www.instagram.com/p/CHILD001/",
+                "firstComment": "",
+                "latestComments": [],
+                "likesCount": 0,
+                "timestamp": "2024-03-10T09:00:00.000Z",
+                "childPosts": [],
+                "ownerUsername": "outro_autor",
+                "ownerId": "u005"
+            }
+        ]
+    }
+]
