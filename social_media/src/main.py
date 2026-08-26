@@ -5,7 +5,6 @@ from uuid import uuid4
 
 from social_media.src.config import build_config
 from social_media.src.dependencies import build_dependencies
-from social_media.src.exporters.csv import export_csvs
 from social_media.src.exporters.png import export_charts
 from social_media.src.exporters.xlsx import export_xlsx
 from social_media.src.extract.apify import extract
@@ -23,7 +22,7 @@ from social_media.src.pipeline.steps.timing import timing_step
 
 logger = logging.getLogger(__name__)
 
-_STEPS = [
+STEPS = [
     parse_step,
     post_features_step,
     comment_features_step,
@@ -63,12 +62,11 @@ async def main() -> None:
     raw_json_path = await extract(links, config, run_id)
 
     initial_dfs = {"raw_json_path": raw_json_path}
-    dfs = run_pipeline(_STEPS, initial_dfs, config, deps)
+    dfs = run_pipeline(STEPS, initial_dfs, config, deps)
 
     output_root = config.output_dir / run_id
     export_xlsx(dfs, output_root, config)
     export_charts(dfs, output_root / "charts", config)
-    export_csvs(dfs, output_root)
 
     logger.info(
         "Execução finalizada.",

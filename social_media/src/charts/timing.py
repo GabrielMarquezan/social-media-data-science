@@ -35,8 +35,8 @@ def plot_engagement_heatmap_hour_weekday(posts: pd.DataFrame) -> Figure:
     ax.set_yticklabels([str(h) for h in range(24)])
     ax.set_xlabel("Dia da Semana")
     ax.set_ylabel("Hora do Dia")
-    ax.set_title("Heatmap de Comments per Like (Hora × Dia da Semana)")
-    fig.colorbar(im, ax=ax, label="Avg Comments per Like")
+    ax.set_title("Heatmap de Comentários por Curtida (Hora × Dia da Semana)")
+    fig.colorbar(im, ax=ax, label="Média de Comentários por Curtida")
 
     # Anota valores apenas quando a matriz é pequena o suficiente para ser legível
     non_null_count = pivot.notna().sum().sum()
@@ -67,7 +67,7 @@ def plot_avg_likes_comments_by_weekday(timing_by_weekday: pd.DataFrame) -> Figur
 
     if df.empty:
         ax.text(0.5, 0.5, "Sem dados por dia da semana", ha="center", va="center")
-        ax.set_title("Média de Likes e Comentários por Dia da Semana")
+        ax.set_title("Média de Curtidas e Comentários por Dia da Semana")
         return fig
 
     # Garante que todos os dias da semana apareçam no eixo x
@@ -81,12 +81,12 @@ def plot_avg_likes_comments_by_weekday(timing_by_weekday: pd.DataFrame) -> Figur
     x = np.arange(len(df))
     width = 0.35
 
-    ax.bar(x - width / 2, df["avg_likes"], width, label="Avg Likes", color="#1f77b4")
-    ax.bar(x + width / 2, df["avg_comments"], width, label="Avg Comments", color="#ff7f0e")
+    ax.bar(x - width / 2, df["avg_likes"], width, label="Média de Curtidas", color="#1f77b4")
+    ax.bar(x + width / 2, df["avg_comments"], width, label="Média de Comentários", color="#ff7f0e")
 
     ax.set_xlabel("Dia da Semana")
     ax.set_ylabel("Média")
-    ax.set_title("Média de Likes e Comentários por Dia da Semana")
+    ax.set_title("Média de Curtidas e Comentários por Dia da Semana")
     ax.set_xticks(x)
     ax.set_xticklabels(df["weekday_label"])
     ax.legend()

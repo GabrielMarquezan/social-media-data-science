@@ -145,5 +145,43 @@ def test_optional_views_and_duration() -> None:
     assert posts[0].video_duration is None
 
 
+def test_parse_reel_item() -> None:
+    """Reels chegam do Apify como type=Video/productType=clips e devem parsear."""
+    raw = [
+        {
+            "id": "reel_001",
+            "type": "Video",
+            "shortCode": "DEF456abc",
+            "caption": "novo reel da coleção",
+            "url": "https://www.instagram.com/reel/DEF456abc/",
+            "commentsCount": 1,
+            "likesCount": 150,
+            "timestamp": "2025-01-10T18:30:00.000Z",
+            "ownerUsername": "loja",
+            "productType": "clips",
+            "videoViewCount": 5000,
+            "videoDuration": 12.5,
+            "latestComments": [
+                {
+                    "id": "c1",
+                    "text": "ameei esse reel",
+                    "timestamp": "2025-01-10T19:00:00.000Z",
+                    "ownerUsername": "fan1",
+                }
+            ],
+        }
+    ]
+    posts = parse_apify_json(raw)
+
+    assert len(posts) == 1
+    reel = posts[0]
+    assert reel.type == "Video"
+    assert reel.product_type == "clips"
+    assert reel.views == 5000
+    assert reel.video_duration == 12.5
+    assert len(reel.latest_comments) == 1
+    assert reel.latest_comments[0].text == "ameei esse reel"
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

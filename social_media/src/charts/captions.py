@@ -12,13 +12,13 @@ def plot_caption_word_count_vs_engagement(posts: pd.DataFrame) -> Figure:
 
     if df.empty:
         ax.text(0.5, 0.5, "Sem dados suficientes", ha="center", va="center")
-        ax.set_title("Caption Word Count vs. Comments per Like")
+        ax.set_title("Palavras na Legenda vs. Comentários por Curtida")
         return fig
 
     ax.scatter(df["caption_word_count"], df["comments_per_like"], alpha=0.6, edgecolors="black")
-    ax.set_title("Caption Word Count vs. Comments per Like")
+    ax.set_title("Palavras na Legenda vs. Comentários por Curtida")
     ax.set_xlabel("Número de Palavras na Legenda")
-    ax.set_ylabel("Comments per Like")
+    ax.set_ylabel("Comentários por Curtida")
     ax.grid(True, linestyle="--", alpha=0.6)
 
     return fig

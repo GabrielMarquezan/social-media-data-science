@@ -36,7 +36,7 @@ def _extract_caption_terms(
     config: Config,
 ) -> pd.DataFrame:
     if posts is None or posts.empty:
-        return pd.DataFrame(columns=["term", "score", "count"])
+        return pd.DataFrame(columns=["term", "relevancia", "count"])
 
     texts = posts["caption"].fillna("").tolist()
     return extract_top_terms(texts, nlp, embedding_model, config.nlp_top_terms_limit)
@@ -49,7 +49,7 @@ def _extract_comment_terms(
     config: Config,
 ) -> pd.DataFrame:
     if comments is None or comments.empty:
-        return pd.DataFrame(columns=["term", "score", "count"])
+        return pd.DataFrame(columns=["term", "relevancia", "count"])
 
     texts = comments["text"].fillna("").tolist()
     return extract_top_terms(texts, nlp, embedding_model, config.nlp_top_terms_limit)

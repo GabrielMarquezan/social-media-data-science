@@ -16,7 +16,7 @@ def plot_likes_comments_timeline(posts: pd.DataFrame) -> Figure:
         ax.set_title("Likes e Comentários ao Longo do Tempo")
         return fig
 
-    ax.plot(df["timestamp"], df["num_likes"], marker="o", label="Likes", linewidth=2)
+    ax.plot(df["timestamp"], df["num_likes"], marker="o", label="Curtidas", linewidth=2)
     ax.plot(
         df["timestamp"],
         df["num_comentarios"],
@@ -54,7 +54,7 @@ def plot_top_posts_engagement(posts: pd.DataFrame, top_n: int = 10) -> Figure:
 
     ax.barh(labels, top["ranking_metric"], color=colors)
     ax.set_title(f"Top {top_n} Posts por Engajamento")
-    ax.set_xlabel("Engagement Rate (ou Comments per Like)")
+    ax.set_xlabel("Taxa de Engajamento (ou Comentários por Curtida)")
     ax.grid(True, axis="x", linestyle="--", alpha=0.6)
 
     return fig
@@ -93,11 +93,11 @@ def plot_posts_by_type(posts: pd.DataFrame) -> Figure:
         color="#ff7f0e",
         marker="o",
         linewidth=2,
-        label="Avg Comments/Like",
+        label="Média Comentários/Curtida",
     )
-    ax2.set_ylabel("Média de Comments per Like", color="#ff7f0e")
+    ax2.set_ylabel("Média de Comentários por Curtida", color="#ff7f0e")
     ax2.tick_params(axis="y", labelcolor="#ff7f0e")
 
-    ax1.set_title("Volume de Posts por Tipo vs. Média de Comments per Like")
+    ax1.set_title("Volume de Posts por Tipo vs. Média de Comentários por Curtida")
 
     return fig

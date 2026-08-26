@@ -18,10 +18,23 @@ def run_pipeline(
     dfs: dict[str, pd.DataFrame],
     config: Config,
     deps: Dependencies,
+    *,
+    progress_callback: Callable[[str], None] | None = None,
 ) -> dict[str, pd.DataFrame]:
-    """Executa uma sequência de steps funcionais sobre um dicionário de DataFrames."""
+    """Executa uma sequência de steps funcionais sobre um dicionário de DataFrames.
+
+    Args:
+        steps: Sequência de steps a executar.
+        dfs: Dicionário inicial de DataFrames.
+        config: Configuração da aplicação.
+        deps: Dependências injetáveis.
+        progress_callback: Callback opcional chamado com o nome de cada step
+            antes de sua execução (usado pela interface web para progresso).
+    """
     for step in steps:
         step_name = step.__name__
+        if progress_callback is not None:
+            progress_callback(step_name)
         shapes = {name: df.shape for name, df in dfs.items() if isinstance(df, pd.DataFrame)}
         logger.debug(
             "Iniciando step: %s",

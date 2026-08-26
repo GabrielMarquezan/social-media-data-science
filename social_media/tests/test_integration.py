@@ -74,10 +74,14 @@ def _make_mock_nlp():
 
 
 def _make_mock_embedding_model():
+    """Mock de embedding que retorna um vetor por texto recebido (shape correto)."""
+    import numpy as np
     from unittest.mock import MagicMock
 
     model = MagicMock()
-    model.encode = MagicMock(return_value=[[0.0] * 384])
+    model.encode = MagicMock(
+        side_effect=lambda texts, **kwargs: np.array([[0.1] * 384 for _ in texts])
+    )
     return model
 
 
@@ -127,27 +131,27 @@ def test_export_xlsx(tmp_path: Path) -> None:
     workbook = openpyxl.load_workbook(output_path)
     expected_sheets = {
         "Posts",
-        "Comments",
-        "Timing_Hour",
-        "Timing_Weekday",
-        "Content_By_Type",
-        "Quality",
-        "Caption_Top_Terms",
-        "Comment_Top_Terms",
-        "Comment_Topics",
-        "Sentiment_Terms",
+        "Comentários",
+        "Por_Hora",
+        "Por_Dia_da_Semana",
+        "Por_Tipo",
+        "Qualidade",
+        "Termos_da_Legenda",
+        "Termos_dos_Comentários",
+        "Tópicos_dos_Comentários",
+        "Termos_por_Sentimento",
     }
     assert set(workbook.sheetnames) == expected_sheets
 
     posts_sheet = workbook["Posts"]
     header = [cell.value for cell in posts_sheet[1]]
-    assert "num_likes" in header
-    assert "comments_per_like" in header
+    assert "num_curtidas" in header
+    assert "comentários_por_curtida" in header
 
-    quality_sheet = workbook["Quality"]
+    quality_sheet = workbook["Qualidade"]
     quality_checks = [cell.value for cell in quality_sheet["A"]][1:]
-    assert "total_posts" in quality_checks
-    assert "comments_coverage_ratio" in quality_checks
+    assert "Total de posts" in quality_checks
+    assert "Cobertura de comentários" in quality_checks
 
 
 def test_build_quality_report_returns_checks() -> None:
@@ -157,6 +161,31 @@ def test_build_quality_report_returns_checks() -> None:
     assert "check" in report.columns
     assert "value" in report.columns
     assert "status" in report.columns
+
+
+def test_translate_dataframe_renames_columns_and_values() -> None:
+    import pandas as pd
+
+    from social_media.src.exporters.labels import translate_dataframe
+
+    df = pd.DataFrame(
+        {
+            "engagement_rate": [0.1],
+            "check": ["total_posts"],
+            "status": ["warning"],
+            "col_sem_traducao": [1],
+        }
+    )
+    out = translate_dataframe(df)
+
+    assert list(out.columns) == [
+        "taxa_de_engajamento",
+        "verificação",
+        "status",
+        "col_sem_traducao",
+    ]
+    assert out["verificação"].tolist() == ["Total de posts"]
+    assert out["status"].tolist() == ["atenção"]
 
 
 def test_export_charts(tmp_path: Path) -> None:

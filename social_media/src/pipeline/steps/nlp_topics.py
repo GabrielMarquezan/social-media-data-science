@@ -4,7 +4,7 @@ import pandas as pd
 
 from social_media.src.config import Config
 from social_media.src.dependencies import Dependencies
-from social_media.src.nlp.topics import fit_comment_topics
+from social_media.src.nlp.topics import TOPIC_COLUMNS, fit_comment_topics
 
 logger = logging.getLogger(__name__)
 
@@ -17,9 +17,7 @@ def nlp_topics_step(
 
     if comments is None or comments.empty:
         dfs = dict(dfs)
-        dfs["comment_topics"] = pd.DataFrame(
-            columns=["topic_id", "topic_label", "keyword", "score"]
-        )
+        dfs["comment_topics"] = pd.DataFrame(columns=TOPIC_COLUMNS)
         return dfs
 
     texts = comments["text"].fillna("").tolist()

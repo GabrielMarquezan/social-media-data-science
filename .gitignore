@@ -25,6 +25,12 @@ htmlcov/
 /data/raw_*.json
 /output/
 
+# PyInstaller
+/build/
+/dist/
+*.spec
+!coleta-dados.spec
+
 # IDEs
 .vscode/
 .idea/

@@ -6,7 +6,7 @@ Este documento contém instruções para agentes de codificação que forem trab
 
 Pipeline de coleta e análise de dados do Instagram usando o Apify. O fluxo principal:
 
-1. Lê links do Instagram de `links.txt`.
+1. Lê links do Instagram de `links.txt` (posts `/p/` e reels `/reel/`).
 2. Extrai posts e comentários via Apify (ator `apify/instagram-scraper`).
 3. Processa os dados em etapas (`social_media/src/pipeline/steps/`): parse, features de posts/comentários, análise de conteúdo, timing, NLP (termos, tópicos, sentimento).
 4. Exporta resultados em `.xlsx`, `.csv` e `.png` dentro de `output/{run_id}/`.
@@ -34,6 +34,19 @@ cp .env.example .env
 Edite o `.env` e preencha pelo menos `APIFY_API_KEY`.
 
 ## Execução
+
+### Interface web (Streamlit)
+
+```bash
+streamlit run app.py
+```
+
+Abre em http://localhost:8501. O `app.py` da raiz é um ponto de entrada fino que
+chama `social_media.src.ui.app.main()`. A UI executa o pipeline em uma thread de
+fundo (`social_media/src/ui/runner.py::start_run_in_thread`) e consome eventos de
+progresso por uma fila (`social_media/src/ui/progress.py`), sem bloquear o Streamlit.
+
+### CLI
 
 ```bash
 python -m social_media.src.main
@@ -65,13 +78,15 @@ O teste marcado como `slow` (`test_real_data_pipeline_with_real_sentiment_analyz
 
 ## Arquitetura
 
+- `app.py` (raiz) — ponto de entrada da interface web Streamlit.
 - `social_media/src/config.py` — centraliza variáveis de ambiente e defaults.
 - `social_media/src/dependencies.py` — fábrica de dependências pesadas (modelos, clientes).
-- `social_media/src/pipeline/runner.py` — executa as etapas em sequência.
+- `social_media/src/pipeline/runner.py` — executa as etapas em sequência (aceita `progress_callback` opcional).
 - `social_media/src/pipeline/steps/` — transformações de dados.
 - `social_media/src/charts/` — funções de plotagem matplotlib.
 - `social_media/src/exporters/` — exportadores XLSX, CSV e PNG.
 - `social_media/src/extract/` — extração de dados (Apify).
+- `social_media/src/ui/` — interface web: `app.py` (visões Streamlit), `runner.py` (orquestração em thread), `progress.py` (eventos), `validation.py` (URLs), `runs.py` (execuções anteriores).
 - `social_media/tests/` — testes organizados por componente.
 
 ## Cuidados
@@ -87,11 +102,13 @@ O teste marcado como `slow` (`test_real_data_pipeline_with_real_sentiment_analyz
 - `bertopic`, `keybert`, `sentence-transformers`, `spacy`, `transformers`, `torch`
 - `pandas`, `openpyxl`, `matplotlib`
 - `pytest`, `python-dotenv`, `scikit-learn`
+- `streamlit` (interface web)
 
 ## Saídas esperadas
 
 Após uma execução bem-sucedida, `output/{run_id}/` conterá:
 
-- `metrics.xlsx` — métricas consolidadas por aba.
+- `metrics.xlsx` — métricas consolidadas por aba (posts, comentários, termos, tópicos, sentimentos, timing, qualidade).
 - `charts/*.png` — gráficos do MVP.
-- Vários arquivos `.csv` com DataFrames intermediários.
+
+Execuções antigas podem conter arquivos `.csv` (formato de exportação anterior); a interface os exibe em uma seção "formato antigo".

@@ -69,11 +69,28 @@ O comportamento do pipeline é controlado por variáveis de ambiente. Veja a des
 
 ## Execução
 
-1. Crie ou atualize o arquivo `links.txt` na raiz do projeto, com uma URL do Instagram por linha. Exemplo:
+### Interface web (Streamlit)
+
+A forma mais simples de usar o projeto é pela interface web:
+
+```bash
+streamlit run app.py
+```
+
+A interface abre em http://localhost:8501 e permite:
+
+- Colar uma URL de post ou reel do Instagram por linha (com validação dos formatos `https://www.instagram.com/p/{shortcode}/` e `https://www.instagram.com/reel/{shortcode}/`).
+- Iniciar a execução e acompanhar o progresso em tempo real (extração, etapas do pipeline, exportação).
+- Visualizar e baixar os resultados: `metrics.xlsx` completo, tabelas individuais em XLSX e gráficos PNG, além de tabelas interativas.
+- Navegar pelas execuções anteriores em `output/{run_id}/`, incluindo marcação de execuções incompletas.
+
+### Linha de comando (CLI)
+
+1. Crie ou atualize o arquivo `links.txt` na raiz do projeto, com uma URL do Instagram por linha (posts `/p/` e reels `/reel/` são aceitos). Exemplo:
 
    ```text
    https://www.instagram.com/p/ABC123/
-   https://www.instagram.com/p/DEF456/
+   https://www.instagram.com/reel/DEF456/
    ```
 
 2. Execute o pipeline:
@@ -84,9 +101,55 @@ O comportamento do pipeline é controlado por variáveis de ambiente. Veja a des
 
 3. Ao final, os resultados estarão em `output/{run_id}/`:
 
-   - `metrics.xlsx` — métricas consolidadas, uma aba por DataFrame.
+   - `metrics.xlsx` — métricas consolidadas, uma aba por tabela (posts, comentários, termos, tópicos, sentimentos, timing, qualidade).
    - `charts/*.png` — gráficos do MVP.
-   - Vários arquivos `.csv` com DataFrames intermediários do pipeline.
+
+## Distribuição para Windows (executável standalone)
+
+O projeto pode ser empacotado como um executavel Windows que abre a interface web com duplo clique.
+
+### Para o usuario final
+
+1. Baixe o arquivo `ColetaDeDados-windows.zip` da ultima release (ou receba a pasta `ColetaDeDados/`).
+2. Descompacte em qualquer lugar do computador.
+3. Abra a pasta `ColetaDeDados` e clique duas vezes em `ColetaDeDados.exe`.
+4. O navegador padrao abrira automaticamente em http://localhost:8501.
+5. Na primeira execucao, o programa baixa automaticamente os modelos de IA (spaCy ja vem incluso; Transformers e sentence-transformers sao baixados no primeiro uso). Isso pode levar alguns minutos, dependendo da conexao.
+
+> A chave `APIFY_API_KEY` pode ser informada atraves de uma variavel de ambiente ou de um arquivo `.env` dentro da pasta do executavel.
+
+### Como gerar o executavel (build no Windows)
+
+Requisitos:
+
+- Windows 10/11
+- Python 3.14+
+- Git (opcional, para clonar o repositorio)
+
+Passos:
+
+```powershell
+# Clone ou copie o projeto para a maquina Windows
+git clone <url-do-repositorio>
+cd coleta_de_dados
+
+# Crie e ative o ambiente virtual
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+
+# Instale as dependencias e o PyInstaller
+pip install -e ".[dev]"
+python -m spacy download pt_core_news_sm
+
+# Gere o executavel (modo pasta --onedir)
+python -m PyInstaller coleta-dados.spec --noconfirm --clean
+```
+
+O resultado ficara em `dist\ColetaDeDados\`. Compacte essa pasta e distribua.
+
+### Build automatico com GitHub Actions
+
+O repositorio inclui o workflow `.github/workflows/build-windows.yml`. A cada tag `v*`, uma release e gerada automaticamente com o arquivo `ColetaDeDados-windows.zip` anexado.
 
 ## Testes
 
@@ -110,6 +173,7 @@ pytest social_media/tests
 .
 ├── .env.example              # Exemplo de variáveis de ambiente
 ├── AGENTS.md                 # Guia para agentes de codificação
+├── app.py                    # Ponto de entrada da interface web (streamlit run app.py)
 ├── links.txt                 # Links do Instagram a serem processados
 ├── pyproject.toml            # Dependências e configurações do projeto
 ├── README.md                 # Este arquivo
@@ -124,11 +188,12 @@ pytest social_media/tests
     │   ├── exporters/        # Exportadores XLSX, CSV e PNG
     │   ├── extract/          # Extração de dados via Apify
     │   ├── log.py            # Configuração de logging
-    │   ├── main.py           # Ponto de entrada do pipeline
+    │   ├── main.py           # Ponto de entrada do pipeline (CLI)
     │   ├── metrics/          # Cálculo de métricas
     │   ├── nlp/              # Funções de NLP (termos, tópicos, sentimento)
     │   ├── pipeline/         # Runner e steps de transformação
-    │   └── services/         # Serviços auxiliares
+    │   ├── services/         # Serviços auxiliares
+    │   └── ui/               # Interface web (app, orquestrador, validação, execuções)
     └── tests/                # Testes organizados por componente
 ```
 

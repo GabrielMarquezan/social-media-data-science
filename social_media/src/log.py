@@ -5,6 +5,23 @@ import sys
 
 _run_id = None
 
+
+class _TransformersAliasWarningFilter(logging.Filter):
+    """Descarta avisos de módulos-alias deprecados do transformers.
+
+    O transformers 5.x registra módulos de compatibilidade em `sys.modules`
+    (ex.: `transformers.models.*.image_processing_*_fast`) que emitem um
+    WARNING a qualquer acesso de atributo — incluindo `__path__`, acessado
+    por ferramentas como o file watcher do Streamlit. Esses avisos são ruído
+    e não indicam problema na aplicação.
+    """
+
+    _MESSAGE_NEEDLE = "this alias will be removed in future versions"
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return self._MESSAGE_NEEDLE not in record.getMessage()
+
+
 class _JSONFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         data = {
@@ -85,6 +102,14 @@ def configure_logging(
         "torch",
     ):
         logging.getLogger(noisy_logger).setLevel(logging.WARNING)
+
+    # O logger do transformers usa handler próprio com propagate=False, então
+    # o filtro precisa ser aplicado diretamente nele (e não no root logger).
+    transformers_logger = logging.getLogger("transformers")
+    if not any(
+        isinstance(f, _TransformersAliasWarningFilter) for f in transformers_logger.filters
+    ):
+        transformers_logger.addFilter(_TransformersAliasWarningFilter())
 
     logging.getLogger(__name__).debug(
         "Logging configured with level=%s and format=%s.",

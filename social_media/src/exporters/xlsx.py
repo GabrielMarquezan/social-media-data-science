@@ -5,21 +5,9 @@ from pathlib import Path
 import pandas as pd
 
 from social_media.src.config import Config
+from social_media.src.exporters.labels import SHEET_NAMES, translate_dataframe
 
 logger = logging.getLogger(__name__)
-
-_SHEET_CONFIG: dict[str, dict[str, str | None]] = {
-    "posts": {"sheet_name": "Posts", "index": False},
-    "comments": {"sheet_name": "Comments", "index": False},
-    "timing_by_hour": {"sheet_name": "Timing_Hour", "index": False},
-    "timing_by_weekday": {"sheet_name": "Timing_Weekday", "index": False},
-    "content_by_type": {"sheet_name": "Content_By_Type", "index": False},
-    "quality": {"sheet_name": "Quality", "index": False},
-    "caption_top_terms": {"sheet_name": "Caption_Top_Terms", "index": False},
-    "comment_top_terms": {"sheet_name": "Comment_Top_Terms", "index": False},
-    "comment_topics": {"sheet_name": "Comment_Topics", "index": False},
-    "sentiment_term_comparison": {"sheet_name": "Sentiment_Terms", "index": False},
-}
 
 
 def build_quality_report(dfs: dict[str, pd.DataFrame]) -> pd.DataFrame:
@@ -124,18 +112,7 @@ def export_xlsx(
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / "metrics.xlsx"
 
-    sheet_order = [
-        ("posts", "Posts"),
-        ("comments", "Comments"),
-        ("timing_by_hour", "Timing_Hour"),
-        ("timing_by_weekday", "Timing_Weekday"),
-        ("content_by_type", "Content_By_Type"),
-        ("quality", "Quality"),
-        ("caption_top_terms", "Caption_Top_Terms"),
-        ("comment_top_terms", "Comment_Top_Terms"),
-        ("comment_topics", "Comment_Topics"),
-        ("sentiment_term_comparison", "Sentiment_Terms"),
-    ]
+    sheet_order = list(SHEET_NAMES.items())
 
     dfs = dict(dfs)
     if "quality" not in dfs or dfs["quality"] is None:
@@ -148,6 +125,7 @@ def export_xlsx(
                 logger.warning("DataFrame '%s' não encontrado; pulando aba '%s'.", key, sheet_name)
                 continue
             df = _make_datetimes_excel_compatible(df)
+            df = translate_dataframe(df)
             df.to_excel(writer, sheet_name=sheet_name, index=False)
             _style_worksheet(writer, sheet_name, df)
 
