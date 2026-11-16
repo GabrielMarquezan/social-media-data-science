@@ -163,12 +163,12 @@ def _finalize_run() -> None:
 
 
 def _render_new_run_view() -> None:
-    """Visao de entrada de links e acompanhamento de progresso."""
-    st.header("Nova execucao")
+    """Visão de entrada de links e acompanhamento de progresso."""
+    st.header("Nova execução")
     st.caption("Cole uma URL de post ou reel do Instagram por linha.")
     st.info(
-        "Dica: na primeira execucao, os modelos de IA sao baixados automaticamente. "
-        "Use o botao 'Preparar modelos agora' na barra lateral para acelerar o processo.",
+        "Dica: na primeira execução, os modelos de IA são baixados automaticamente. "
+        "Use o botão 'Preparar modelos agora' na barra lateral para acelerar o processo.",
         icon="💡",
     )
 
@@ -386,11 +386,11 @@ def _render_past_runs_view() -> None:
 
 
 def _render_model_warmup() -> None:
-    """Botao opcional na sidebar para pre-baixar modelos de IA."""
+    """Botão opcional na sidebar para pre-baixar modelos de IA."""
     with st.sidebar.expander("Modelos de IA"):
         st.caption(
-            "Na primeira execucao, os modelos de sentimento, embeddings e topicos "
-            "sao baixados automaticamente. Isso pode levar alguns minutos."
+            "Na primeira execução, os modelos de sentimento, embeddings e tópicos "
+            "são baixados automaticamente. Isso pode levar alguns minutos."
         )
         if st.button("Preparar modelos agora", key="warmup_models"):
             with st.spinner("Verificando modelos..."):
